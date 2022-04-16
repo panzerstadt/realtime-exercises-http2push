@@ -1,9 +1,12 @@
 const chat = document.getElementById("chat");
 const msgs = document.getElementById("msgs");
 const presence = document.getElementById("presence-indicator");
+const users = document.getElementById("user-count")
+
 
 // this will hold all the most recent messages
 let allChat = [];
+let userCount = 0;
 
 chat.addEventListener("submit", function (e) {
   e.preventDefault();
@@ -32,18 +35,58 @@ async function postNewMsg(user, text) {
 }
 
 async function getNewMsgs() {
-  /*
-   *
-   * code goes here
-   *
-   */
+  let reader;
+  const utf8Decoder = new TextDecoder('utf-8')
+  try {
+    const res = await fetch("/msgs");
+    reader = res.body.getReader()
+  } catch (e) {
+    console.log("connection error", e)
+  }
+  presence.innerText = "🟢"
+
+  do {
+    let readerResponse;
+
+    // read from stream ONCE
+    try {
+      readerResponse = await reader.read()
+    } catch (e) {
+      console.error("reader failed", e)
+      presence.innerText = "🔴 - disconnectd. please refresh page."
+      return
+    }
+
+    done = readerResponse.done
+    const chunk = utf8Decoder.decode(readerResponse.value, { stream: true })
+    console.log("chunk: ", chunk)
+    if (chunk) {
+      try {
+        const json = JSON.parse(chunk)
+        allChat = json.msg
+        userCount = json.users
+        console.log("how mayn users", userCount)
+        render()
+      } catch (e) {
+        console.error("parse error", e)
+      }
+    }
+
+  } while (!done)
+
 }
 
 function render() {
-  const html = allChat.map(({ user, text, time, id }) =>
-    template(user, text, time, id)
-  );
-  msgs.innerHTML = html.join("\n");
+  if (allChat !== undefined) {
+
+    const html = allChat.map(({ user, text, time, id }) =>
+      template(user, text, time, id)
+    );
+    msgs.innerHTML = html.join("\n");
+  }
+  if (userCount !== undefined) {
+    users.innerHTML = userCount
+  }
 }
 
 const template = (user, msg) =>
