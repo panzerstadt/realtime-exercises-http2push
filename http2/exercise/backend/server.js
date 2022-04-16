@@ -12,7 +12,7 @@ const getMsgs = () => Array.from(msg).reverse();
 
 msg.push({
   user: "brian",
-  text: "hi",
+  text: "whut wut *ts whut *ts whut *ts whut",
   time: Date.now(),
 });
 
