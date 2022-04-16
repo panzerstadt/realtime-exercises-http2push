@@ -17,3 +17,9 @@ h1 {
   top: 5px;
   right: 15px;
 }
+
+#user-count-wrapper {
+  position: absolute;
+  top: 30px;
+  right: 20px;
+}
