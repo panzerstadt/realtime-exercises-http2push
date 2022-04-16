@@ -7,7 +7,9 @@ import nanobuffer from "nanobuffer";
 
 let connections = [];
 
-const msg = new nanobuffer(50);
+// TODO: nanobufferis a fixed size array, newer mesasges will
+// overwrite the old ones once its full
+const msg = new nanobuffer(5);
 const getMsgs = () => Array.from(msg).reverse();
 
 msg.push({
